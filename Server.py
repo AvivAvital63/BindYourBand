@@ -9,14 +9,16 @@ messages = []
 
 
 @app.route('/', methods=['GET'])
-def return_all():
+def do_get():
+    #TODO: send files to user
     return jsonify({'messages': messages})
 
 
 @app.route('/', methods=['POST'])
-def addOne():
+def do_post():
     message = "Client Sent To Server At: " + str(datetime.now())
     messages.append(message)
+    # TODO: receive files from user
     return jsonify({'messages': messages})
 
 
