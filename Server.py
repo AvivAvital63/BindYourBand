@@ -1,33 +1,28 @@
-import socket  # Import socket module
-import thread
+from flask import Flask
+from flask import jsonify
+import os
+from datetime import datetime
 
-def serverSettings():
-    s = socket.socket()  # Create a socket object
-    host = socket.gethostname()  # Get local machine name
-    port = 7777  # Reserve a port for your service.
 
-    print 'Server started!'
-    print 'Waiting for clients...'
+app = Flask(__name__)
+messages = []
 
-    s.bind((host, port))  # Bind to the port
-    s.listen(5)  # Now wait for client connection.
 
-    while True:
-        c, addr = s.accept()  # Establish connection with client.
-        print 'Got connection from', addr
-        thread.start_new_thread(on_new_client, (c, addr))
+@app.route('/', methods=['GET'])
+def return_all():
+    return jsonify({'messages': messages})
 
-    s.close()
 
-def on_new_client(clientsocket, addr):
-    while True:
-        msg = clientsocket.recv(1024)
-        # do some checks and if msg == someWeirdSignal: break:
-        print addr, ' >> ', msg
-        msg = raw_input('SERVER >> ')
-        clientsocket.send(msg)
-    clientsocket.close()
+@app.route('/', methods=['POST'])
+def addOne():
+    message = "Client Sent To Server At: " + str(datetime.now())
+    messages.append(message)
+    return jsonify({'messages': messages})
+
+
+def main():
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 7777)))
 
 
 if __name__ == "__main__":
-    serverSettings()
+    main()
